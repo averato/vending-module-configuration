@@ -1,0 +1,54 @@
+services:
+  chromium:
+    image: ghcr.io/averato/vending-chromium:latest
+    privileged: true
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix
+      - /run/dbus:/run/dbus
+      - ./chromium/managed_policies.json:/etc/chromium/policies/managed/managed_policies.json
+      - /dev:/dev
+      - /sys:/sys:ro
+      - /dev/shm:/dev/shm
+      - /run/udev:/run/udev:ro
+    devices:
+      - /dev/bus/usb
+      - /dev/usb
+      - /dev/dri:/dev/dri
+    environment:
+      - DISPLAY=:0
+      - XAUTHORITY=$HOME/.Xauthority
+      - DBUS_SESSION_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket # removes the wrong address warning
+    entrypoint:
+      - chromium
+      - --incognito
+      - --disable-dev-shm-usage
+      # - --kiosk
+      - --disable-background-networking
+      - --disable-plugins
+      - --no-pings
+      - --disable-translate
+      - --disable-session-crashed-bubble
+      - --noerrdialogs
+      - --disable-infobars
+      - --disable-fre
+      - --no-default-browser-check-
+      - --no-first-run
+      - --disable-pinch
+      - --overscroll-history-navigation=0
+      - --no-context-menu
+      - https://api.dev.averato.com/vending-menu/sushimate_test
+
+  app:
+    image: ghcr.io/averato/vending-raspberry:latest
+    privileged: true
+    devices:
+      - /dev/gpiochip0
+    volumes:
+      - /dev:/dev
+      - /sys:/sys
+    # restart: always
+    ports:
+      - 8888:8888
+
+
+
