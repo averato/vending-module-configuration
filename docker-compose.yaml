@@ -2,6 +2,7 @@ services:
   chromium:
     image: ghcr.io/averato/vending-chromium:latest
     privileged: true
+    restart: unless-stopped
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /run/dbus:/run/dbus
@@ -22,7 +23,7 @@ services:
       - chromium
       - --incognito
       - --disable-dev-shm-usage
-      # - --kiosk
+      - --kiosk
       - --disable-background-networking
       - --disable-plugins
       - --no-pings
@@ -41,14 +42,11 @@ services:
   app:
     image: ghcr.io/averato/vending-raspberry:latest
     privileged: true
+    restart: unless-stopped
     devices:
       - /dev/gpiochip0
     volumes:
       - /dev:/dev
       - /sys:/sys
-    # restart: always
     ports:
       - 8888:8888
-
-
-
