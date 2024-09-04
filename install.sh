@@ -17,12 +17,10 @@ if [ -z "$GHCR_TOKEN" ]; then
 fi
 
 if [ "$DRY_RUN" == "false" ]; then
-  git clone git@github.com:averato/vending-module-configuration.git
+  git clone https://github.com/averato/vending-module-configuration.git
   cd vending-module-configuration
 fi
 
 echo $GHCR_TOKEN | docker login ghcr.io -u averato --password-stdin
-
-docker compose up -d
 
 docker logout ghcr.io
