@@ -23,4 +23,6 @@ fi
 
 echo $GHCR_TOKEN | docker login ghcr.io -u averato --password-stdin
 
+docker compose pull
+
 docker logout ghcr.io
