@@ -6,7 +6,6 @@ services:
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix
       - /run/dbus:/run/dbus
-      - ./chromium/managed_policies.json:/etc/chromium/policies/managed/managed_policies.json
       - /dev:/dev
       - /sys:/sys:ro
       - /dev/shm:/dev/shm
@@ -16,8 +15,8 @@ services:
       - /dev/usb
       - /dev/dri:/dev/dri
     environment:
-      - DISPLAY=:0
-      - XAUTHORITY=$HOME/.Xauthority
+      - DISPLAY=${DISPLAY}
+      - XAUTHORITY=${HOME}/.Xauthority
       - DBUS_SESSION_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket # removes the wrong address warning
     entrypoint:
       - chromium
