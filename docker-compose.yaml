@@ -15,8 +15,7 @@ services:
       - /dev/usb
       - /dev/dri:/dev/dri
     environment:
-      - DISPLAY=${DISPLAY}
-      - APP_DEVICE_ID=${APP_DEVICE_ID}
+      - DISPLAY
       - XAUTHORITY=${HOME}/.Xauthority
       - DBUS_SESSION_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket # removes the wrong address warning
     entrypoint:
@@ -51,8 +50,8 @@ services:
     ports:
       - 8888:8888
     environment:
-      - APP_MQTT_DOMAIN=${APP_MQTT_DOMAIN}
-      - APP_MQTT_USER=${APP_MQTT_USER}
-      - APP_MQTT_PASSWORD=${APP_MQTT_PASSWORD}
-      - APP_MQTT_PORT=${APP_MQTT_PORT}
-      - APP_DEVICE_ID=${APP_DEVICE_ID}
+      - APP_MQTT_DOMAIN
+      - APP_MQTT_USER
+      - APP_MQTT_PASSWORD
+      - APP_MQTT_PORT
+      - APP_DEVICE_ID
