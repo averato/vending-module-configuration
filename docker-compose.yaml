@@ -16,6 +16,7 @@ services:
       - /dev/dri:/dev/dri
     environment:
       - DISPLAY=${DISPLAY}
+      - APP_DEVICE_ID=${APP_DEVICE_ID}
       - XAUTHORITY=${HOME}/.Xauthority
       - DBUS_SESSION_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket # removes the wrong address warning
     entrypoint:
@@ -36,7 +37,7 @@ services:
       - --disable-pinch
       - --overscroll-history-navigation=0
       - --no-context-menu
-      - https://api.dev.averato.com/vending-menu/sushimate_test
+      - https://api.dev.averato.com/vending-menu/${APP_DEVICE_ID}
 
   app:
     image: ghcr.io/averato/vending-raspberry:latest
@@ -49,3 +50,9 @@ services:
       - /sys:/sys
     ports:
       - 8888:8888
+    environment:
+      - APP_MQTT_DOMAIN=${APP_MQTT_DOMAIN}
+      - APP_MQTT_USER=${APP_MQTT_USER}
+      - APP_MQTT_PASSWORD=${APP_MQTT_PASSWORD}
+      - APP_MQTT_PORT=${APP_MQTT_PORT}
+      - APP_DEVICE_ID=${APP_DEVICE_ID}
