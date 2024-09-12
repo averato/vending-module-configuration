@@ -16,6 +16,8 @@ services:
       - /dev/dri:/dev/dri
     environment:
       - DISPLAY
+      - WIDTH
+      - HEIGHT
       - XAUTHORITY=${HOME}/.Xauthority
       - DBUS_SESSION_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket # removes the wrong address warning
     entrypoint:
@@ -36,6 +38,10 @@ services:
       - --disable-pinch
       - --overscroll-history-navigation=0
       - --no-context-menu
+      - --window-position=0,0
+      - --window-size=${WIDTH},${HEIGHT}
+      - --start-fullscreen
+      - --start-maximized
       - https://api.dev.averato.com/vending-menu/${APP_DEVICE_ID}
 
   app:
