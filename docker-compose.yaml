@@ -1,6 +1,6 @@
 services:
   chromium:
-    image: ghcr.io/averato/vending-chromium:latest
+    image: ghcr.io/averato/vending-chromium@sha256:6ea25bcb00db45cd3df7e73d5ffdb7f423345f5b4a04a932369293d3571343de
     privileged: true
     restart: unless-stopped
     volumes:
