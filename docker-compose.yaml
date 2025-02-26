@@ -1,6 +1,6 @@
 services:
   chromium:
-    image: ghcr.io/averato/vending-chromium:latest
+    image: ghcr.io/averato/vending-chromium@sha256:6ea25bcb00db45cd3df7e73d5ffdb7f423345f5b4a04a932369293d3571343de
     privileged: true
     restart: unless-stopped
     volumes:
@@ -42,7 +42,7 @@ services:
       - --window-size=${WIDTH},${HEIGHT}
       - --start-fullscreen
       - --start-maximized
-      - https://api.averato.com/vending-menu/${APP_DEVICE_ID}?origin=machine
+      - https://api.${APP_MQTT_DOMAIN}/vending-menu/${APP_DEVICE_ID}?origin=machine
 
   app:
     image: ghcr.io/averato/vending-raspberry:latest
@@ -53,6 +53,8 @@ services:
     volumes:
       - /dev:/dev
       - /sys:/sys
+    networks:
+      - monitoring
     ports:
       - 8888:8888
     environment:
@@ -61,3 +63,55 @@ services:
       - APP_MQTT_PASSWORD
       - APP_MQTT_PORT
       - APP_DEVICE_ID
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    user: root
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    volumes:
+      - ./loki-config.yaml:/etc/loki/local-config.yaml:ro
+      - loki-data:/tmp/loki
+    networks:
+      - monitoring
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3100/ready || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_USERNAME:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_PASSWORD:-admin}
+      - GF_AUTH_ANONYMOUS_ENABLED=false
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+    volumes:
+      - ./grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml:ro
+      - grafana-data:/var/lib/grafana
+    networks:
+      - monitoring
+    depends_on:
+      - loki
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  monitoring:
+    driver: bridge
+
+volumes:
+  loki-data:
+    driver: local
+  grafana-data:
+    driver: local
