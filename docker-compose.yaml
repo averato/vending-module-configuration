@@ -1,6 +1,7 @@
 services:
   chromium:
-    image: ghcr.io/averato/vending-chromium@sha256:6ea25bcb00db45cd3df7e73d5ffdb7f423345f5b4a04a932369293d3571343de
+#    image: ghcr.io/averato/vending-chromium@sha256:6ea25bcb00db45cd3df7e73d5ffdb7f423345f5b4a04a932369293d3571343de
+    image: ghcr.io/averato/vending-chromium:latest-xy
     privileged: true
     restart: unless-stopped
     volumes:
@@ -10,16 +11,21 @@ services:
       - /sys:/sys:ro
       - /dev/shm:/dev/shm
       - /run/udev:/run/udev:ro
+#      - /media/pi/VENDING:/media/pi/VENDING:ro
     devices:
       - /dev/bus/usb
       - /dev/usb
       - /dev/dri:/dev/dri
+      - /dev/snd:/dev/snd
     environment:
       - DISPLAY
       - WIDTH
       - HEIGHT
       - XAUTHORITY=${HOME}/.Xauthority
       - DBUS_SESSION_BUS_ADDRESS=unix:path=/run/dbus/system_bus_socket # removes the wrong address warning
+      - PULSE_SERVER=tcp:172.17.0.1:4713
+      - APP_MQTT_DOMAIN
+      - APP_DEVICE_ID
     entrypoint:
       - chromium
       - --incognito
@@ -42,27 +48,34 @@ services:
       - --window-size=${WIDTH},${HEIGHT}
       - --start-fullscreen
       - --start-maximized
+      - --enable-auto-reload
+      - --allow-file-access-from-files
       - https://api.${APP_MQTT_DOMAIN}/vending-menu/${APP_DEVICE_ID}?origin=machine
 
   app:
-    image: ghcr.io/averato/vending-raspberry:latest
+    image: ghcr.io/averato/vending-raspberry:latest-xy
     privileged: true
     restart: unless-stopped
     devices:
       - /dev/gpiochip0
+      - /dev/spidev0.0
     volumes:
       - /dev:/dev
       - /sys:/sys
+      - /proc:/proc
     networks:
       - monitoring
     ports:
       - 8888:8888
+    #env_file:
+     # - /home/averato/vending.env
     environment:
       - APP_MQTT_DOMAIN
       - APP_MQTT_USER
       - APP_MQTT_PASSWORD
       - APP_MQTT_PORT
       - APP_DEVICE_ID
+      - APP_VENDING_MACHINE_MODEL
   loki:
     image: grafana/loki:latest
     container_name: loki
